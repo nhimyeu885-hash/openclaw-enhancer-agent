@@ -1,0 +1,63 @@
+version: "1.0"
+agent_id: "openclaw-enhancer"
+enabled: true
+
+optimization_stage: "both"
+fidelity_priority: "preserve-original-capability"
+token_budget_mode: "value-tiered"
+dedupe_policy: "semantic-first-with-raw-fallback"
+summary_mode: "structured-brief"
+safe_l0_autofix: true
+
+run_mode_rules:
+  default_mode: "optimize"
+  allowed_modes:
+    - "passthrough"
+    - "optimize"
+    - "fallback"
+  force_passthrough_when:
+    - "任务目标不明确"
+    - "下游链路要求完整原文"
+    - "关键上下文无法压缩且必须保留"
+  force_fallback_when:
+    - "增强后可能改变任务意图"
+    - "结果完整性存在明显风险"
+    - "上下文缺失导致路由信心不足"
+
+pre_dispatch:
+  enabled: true
+  value_tiers:
+    P0: "需要完整保真，优先质量"
+    P1: "默认优化，允许轻量压缩"
+    P2: "优先节省 token，保留关键结论"
+  actions:
+    - "classify_task_value"
+    - "detect_duplicate_queries"
+    - "apply_token_budget"
+    - "compress_non_critical_instructions"
+    - "preserve_user_intent_and_required_details"
+
+post_result:
+  enabled: true
+  actions:
+    - "merge_duplicate_findings"
+    - "remove_repeated_boilerplate"
+    - "summarize_long_results"
+    - "keep_actions_status_and_risks_explicit"
+
+l0_autofix:
+  allowed_targets:
+    - "prompt"
+    - "config"
+    - "cron"
+  deny_targets:
+    - "business_logic"
+    - "role_boundaries"
+    - "data_schema"
+    - "channel_topology"
+  required_acceptance:
+    - "gateway_reachable"
+    - "discord_delivery_ok"
+    - "critical_cron_ok"
+    - "token_monitor_write_ok"
+    - "memory_rw_ok"

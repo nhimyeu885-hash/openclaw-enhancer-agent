@@ -1,0 +1,25 @@
+version: "1.0"
+
+checks:
+  gateway_reachable:
+    required: true
+    description: "网关和核心依赖可达"
+  discord_delivery_ok:
+    required: true
+    description: "Discord 通道可发送摘要或告警"
+  dingtalk_placeholder_ok:
+    required: false
+    description: "DingTalk 先做接口占位检查，不阻塞主流程"
+  critical_cron_ok:
+    required: true
+    description: "关键 cron 处于可执行状态"
+  token_monitor_write_ok:
+    required: true
+    description: "token 监控可正常写盘"
+  memory_rw_ok:
+    required: true
+    description: "memory 文件可读写"
+
+failure_policy:
+  any_required_check_failed: "trigger_rollback_or_block"
+  log_path: "result/system/changelog.md"

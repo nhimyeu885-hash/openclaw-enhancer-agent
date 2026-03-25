@@ -1,0 +1,32 @@
+version: "1.0"
+
+change_levels:
+  L0:
+    scope: "prompt/config/cron 的低风险热修"
+    execution: "可自动执行"
+    rollback: "必须支持自动回滚"
+  L1:
+    scope: "功能增强、路由调整、策略新增"
+    execution: "只生成提案和审批包"
+    rollback: "审批通过后再执行"
+  L2:
+    scope: "架构改造、链路重构、数据结构变化"
+    execution: "只生成提案和影响评估"
+    rollback: "必须人工灰度"
+
+review_verdicts:
+  PASS: "可继续执行"
+  BLOCK: "存在风险，暂停自动动作"
+  REJECT: "不符合安全或体验要求"
+
+change_status:
+  - "proposed"
+  - "awaiting_approval"
+  - "approved"
+  - "applied"
+  - "rolled_back"
+
+approval_policy:
+  default_for_l1_l2: "manual-approval-required"
+  default_for_l0: "auto-if-acceptance-pass"
+  owner: "Andy"

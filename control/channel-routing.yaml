@@ -1,0 +1,41 @@
+version: "1.0"
+
+entrypoint:
+  channel: "#homebase"
+  owner: "Andy"
+  enhancer: "openclaw-enhancer"
+
+routing:
+  news:
+    channels:
+      - "#橘鸦日报"
+      - "#股票"
+      - "#能源"
+    responsibility: "外部前沿信息爬取、数据清洗与降噪"
+  core_system:
+    channels:
+      - "#openclaw核心配置"
+    responsibility: "底层系统沟通、配置治理、API 更新、运维优化"
+  digital_human:
+    channels:
+      - "#coach"
+      - "#memory"
+      - "#语音识别"
+    responsibility: "数字人相关开发、测试、记忆、语音链路"
+  collaboration:
+    channels:
+      - "#多agent协作"
+    responsibility: "OpenClaw 工作流优化、分工和 token 节省策略"
+  writing:
+    channels:
+      - "#文字处理"
+    responsibility: "自然语言生成、语义转换、文案起草"
+  insight:
+    channels:
+      - "#洞见启发"
+    responsibility: "科技讨论、发散思维引导与逻辑推演"
+
+result_paths:
+  homebase: "result/system/"
+  dna: "result/project/dna/"
+  coach: "result/project/coach/"

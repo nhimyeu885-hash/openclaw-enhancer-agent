@@ -1,0 +1,31 @@
+version: "1.0"
+
+required_fields:
+  run_mode:
+    allowed:
+      - "passthrough"
+      - "optimize"
+      - "fallback"
+    description: "本次执行采用的增强模式"
+  optimization_actions:
+    type: "list[string]"
+    description: "本次启用的优化动作清单"
+  fallback_used:
+    type: "boolean"
+    description: "是否因为风险、信息不足或质量问题回退"
+  token_saving_estimate:
+    type: "string"
+    description: "预计节省的 token 范围或比例"
+  ux_risk:
+    allowed:
+      - "low"
+      - "medium"
+      - "high"
+    description: "本次增强对原体验造成偏差的风险评估"
+
+report_sections:
+  - "任务目标"
+  - "路由与增强策略"
+  - "关键信息/结论"
+  - "行动项"
+  - "风险与状态"
