@@ -100,6 +100,11 @@ flowchart LR
 
 - `validate_enhancer_setup.py`：检查当前工作区是否完整
 
+### `skills/`
+仓库内镜像的内部维护 skill，方便公开仓库直接携带完整资产。
+
+- `skills/openclaw-agent-maintainer/`：维护 enhancer 的 skill 镜像
+
 ## 快速使用
 
 ### 1. 先看策略和 prompt
@@ -118,6 +123,10 @@ python .\scripts\validate_enhancer_setup.py
 Skill 路径：
 
 `C:\Users\Andyw\.codex\skills\openclaw-agent-maintainer`
+
+仓库镜像路径：
+
+`.\skills\openclaw-agent-maintainer`
 
 它提供：
 - `validate_workspace.py`：校验工作区

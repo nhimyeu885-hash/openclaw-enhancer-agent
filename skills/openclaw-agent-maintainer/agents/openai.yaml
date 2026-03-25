@@ -1,0 +1,6 @@
+interface:
+  display_name: "OpenClaw Agent Maintainer"
+  short_description: "Audit and safely update the OpenClaw enhancer workspace."
+  default_prompt: "Use $openclaw-agent-maintainer to audit or update my OpenClaw enhancer workspace without changing the user-facing flow."
+policy:
+  allow_implicit_invocation: false

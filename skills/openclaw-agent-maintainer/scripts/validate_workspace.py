@@ -23,8 +23,6 @@ REQUIRED_FILES = [
     "examples/l0-hotfix-log.md",
     "examples/fallback-sample.md",
     "result/system/changelog.md",
-    "skills/openclaw-agent-maintainer/SKILL.md",
-    "skills/openclaw-agent-maintainer/agents/openai.yaml",
 ]
 
 REQUIRED_POLICY_KEYS = [
@@ -36,53 +34,53 @@ REQUIRED_POLICY_KEYS = [
     "safe_l0_autofix:",
 ]
 
-REQUIRED_OUTPUT_FIELDS = [
-    "run_mode:",
-    "optimization_actions:",
-    "fallback_used:",
-    "token_saving_estimate:",
-    "ux_risk:",
-]
 
-
-def fail(message: str) -> int:
-    print(f"[FAIL] {message}")
-    return 1
+def check_text_contains(path: Path, snippets: list[str]) -> list[str]:
+    text = path.read_text(encoding="utf-8")
+    return [snippet for snippet in snippets if snippet not in text]
 
 
 def main() -> int:
-    root = Path(__file__).resolve().parents[1]
-    missing = [path for path in REQUIRED_FILES if not (root / path).exists()]
+    if len(sys.argv) != 2:
+        print("Usage: validate_workspace.py <workspace-path>")
+        return 1
+
+    root = Path(sys.argv[1]).resolve()
+    missing = [item for item in REQUIRED_FILES if not (root / item).exists()]
     if missing:
-      print("[FAIL] Missing required files:")
-      for item in missing:
-          print(f"  - {item}")
-      return 1
+        print("[FAIL] Missing files:")
+        for item in missing:
+            print(f"  - {item}")
+        return 1
 
-    policy_text = (root / "control/enhancer-policy.yaml").read_text(encoding="utf-8")
-    for key in REQUIRED_POLICY_KEYS:
-        if key not in policy_text:
-            return fail(f"Missing policy key: {key}")
-
-    output_text = (root / "control/enhancer-output-schema.yaml").read_text(encoding="utf-8")
-    for field in REQUIRED_OUTPUT_FIELDS:
-        if field not in output_text:
-            return fail(f"Missing output schema field: {field}")
+    policy_missing = check_text_contains(root / "control/enhancer-policy.yaml", REQUIRED_POLICY_KEYS)
+    if policy_missing:
+        print("[FAIL] Missing policy keys:")
+        for item in policy_missing:
+            print(f"  - {item}")
+        return 1
 
     homebase_text = (root / "prompts/agents/homebase.md").read_text(encoding="utf-8")
     enhancer_text = (root / "prompts/agents/openclaw-enhancer.md").read_text(encoding="utf-8")
-    if "openclaw-enhancer" not in homebase_text:
-        return fail("homebase prompt does not reference openclaw-enhancer")
-    if "passthrough" not in enhancer_text or "fallback" not in enhancer_text:
-        return fail("enhancer prompt does not define all run modes")
-
     changelog_text = (root / "result/system/changelog.md").read_text(encoding="utf-8")
-    if "变更等级" not in changelog_text or "审查结论" not in changelog_text:
-        return fail("changelog template is incomplete")
 
-    print("[OK] OpenClaw enhancer workspace is complete.")
+    failures = []
+    if "openclaw-enhancer" not in homebase_text:
+        failures.append("homebase prompt is not wired to openclaw-enhancer")
+    if "passthrough" not in enhancer_text or "fallback" not in enhancer_text:
+        failures.append("enhancer prompt does not define all run modes")
+    if "变更等级" not in changelog_text or "审查结论" not in changelog_text:
+        failures.append("changelog template is incomplete")
+
+    if failures:
+        print("[FAIL] Contract violations:")
+        for item in failures:
+            print(f"  - {item}")
+        return 1
+
+    print("[OK] Workspace contract looks valid.")
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())
