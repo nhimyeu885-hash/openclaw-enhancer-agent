@@ -10,6 +10,9 @@ REQUIRED_FILES = [
     "control/acceptance-checklist.yaml",
     "control/channel-routing.yaml",
     "control/enhancer-output-schema.yaml",
+    "control/l0-worker.yaml",
+    "control/gray-rollout.yaml",
+    "control/metrics-policy.yaml",
     "prompts/agents/homebase.md",
     "prompts/agents/openclaw-enhancer.md",
     "prompts/agents/openclaw-core-config.md",
@@ -18,11 +21,19 @@ REQUIRED_FILES = [
     "docs/openclaw-enhancer-design.md",
     "docs/openclaw-enhancer-compare.md",
     "docs/openclaw-agent-maintainer-skill.md",
+    "docs/l0-enhancer-mvp.md",
     "examples/task-before-after.md",
     "examples/summary-sample.md",
     "examples/l0-hotfix-log.md",
     "examples/fallback-sample.md",
+    "examples/runtime-post-input.json",
+    "examples/runtime-fallback-input.json",
+    "examples/manual-review-template.csv",
     "result/system/changelog.md",
+    "scripts/l0_enhancer_worker.py",
+    "scripts/summarize_enhancer_metrics.py",
+    "scripts/record_manual_review.py",
+    "scripts/test_l0_enhancer_worker.py",
     "skills/openclaw-agent-maintainer/SKILL.md",
     "skills/openclaw-agent-maintainer/agents/openai.yaml",
 ]
@@ -34,6 +45,13 @@ REQUIRED_POLICY_KEYS = [
     "dedupe_policy:",
     "summary_mode:",
     "safe_l0_autofix:",
+]
+
+REQUIRED_MVP_KEYS = [
+    "risk_scope:",
+    "low_risk_actions:",
+    "allowed_channels:",
+    "metrics_file:",
 ]
 
 REQUIRED_OUTPUT_FIELDS = [
@@ -54,15 +72,27 @@ def main() -> int:
     root = Path(__file__).resolve().parents[1]
     missing = [path for path in REQUIRED_FILES if not (root / path).exists()]
     if missing:
-      print("[FAIL] Missing required files:")
-      for item in missing:
-          print(f"  - {item}")
-      return 1
+        print("[FAIL] Missing required files:")
+        for item in missing:
+            print(f"  - {item}")
+        return 1
 
     policy_text = (root / "control/enhancer-policy.yaml").read_text(encoding="utf-8")
     for key in REQUIRED_POLICY_KEYS:
         if key not in policy_text:
             return fail(f"Missing policy key: {key}")
+
+    mvp_text = "\n".join(
+        (root / path).read_text(encoding="utf-8")
+        for path in [
+            "control/l0-worker.yaml",
+            "control/gray-rollout.yaml",
+            "control/metrics-policy.yaml",
+        ]
+    )
+    for key in REQUIRED_MVP_KEYS:
+        if key not in mvp_text:
+            return fail(f"Missing MVP control key: {key}")
 
     output_text = (root / "control/enhancer-output-schema.yaml").read_text(encoding="utf-8")
     for field in REQUIRED_OUTPUT_FIELDS:

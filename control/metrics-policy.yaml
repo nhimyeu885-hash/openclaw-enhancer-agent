@@ -1,0 +1,22 @@
+version: "0.1"
+
+metrics_file: "result/system/metrics/enhancer-metrics.jsonl"
+manual_review_file: "result/system/metrics/manual-review.jsonl"
+
+manual_review:
+  sample_rate: 0.2
+  sample_channels:
+    - "#homebase"
+    - "#多agent协作"
+
+required_metrics:
+  - "token_before_estimate"
+  - "token_after_estimate"
+  - "token_saved_estimate"
+  - "fallback_used"
+  - "completeness_proxy_ratio"
+
+report_metrics:
+  - "avg_token_saved_estimate"
+  - "fallback_rate"
+  - "manual_completeness_pass_rate"

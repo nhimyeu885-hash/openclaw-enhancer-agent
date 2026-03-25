@@ -6,5 +6,7 @@ __pycache__/
 Thumbs.db
 
 # Local runtime debris
-result/system/runtime/
+result/system/runtime/*
+!result/system/runtime/.gitkeep
+result/system/metrics/*.jsonl
 result/system/tmp/

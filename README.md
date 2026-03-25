@@ -4,6 +4,8 @@
 
 它的目标很克制：在不改变原来使用方式、不削弱原有能力的前提下，让现有虾更省 token、更少重复、更容易阅读，也更容易后续维护。
 
+当前仓库现在已经包含一个可本地运行的 `L0 enhancer worker` MVP，用来验证“低风险去重 / 结构化 / 短报 / 指标闭环”这条路线。
+
 ## 它能做什么
 
 ### 1. 发任务前做轻量优化
@@ -32,6 +34,11 @@
 - 提供一个内部 skill `openclaw-agent-maintainer`
 - 用它校验工作区、判断变更级别、生成 changelog 模板
 - 这个 skill 不是给 Andy 日常直接操作的入口
+
+### 6. 运行一个本地 MVP worker
+- 用 `scripts/l0_enhancer_worker.py` 处理低风险任务包
+- 输出增强后的 JSON 结果
+- 将 token / fallback / 完整性代理指标写入本地日志
 
 ## 它明确不做什么
 - 不新增默认入口
@@ -63,6 +70,9 @@ flowchart LR
 - `acceptance-checklist.yaml`：热修验收项
 - `channel-routing.yaml`：保留的频道分工与路由
 - `enhancer-output-schema.yaml`：增强层标准输出字段
+- `l0-worker.yaml`：L0 worker 的低风险执行规则
+- `gray-rollout.yaml`：1-2 个频道的灰度放量配置
+- `metrics-policy.yaml`：指标文件、人工抽检与汇总口径
 
 ### `prompts/agents/`
 版本化 agent prompt。
@@ -79,6 +89,7 @@ flowchart LR
 - `openclaw-enhancer-design.md`：设计稿
 - `openclaw-enhancer-compare.md`：现有虾与增强层对照图
 - `openclaw-agent-maintainer-skill.md`：内部维护 skill 设计稿
+- `l0-enhancer-mvp.md`：本地可运行 MVP 的说明
 
 ### `examples/`
 固定展示样例。
@@ -87,11 +98,16 @@ flowchart LR
 - `summary-sample.md`：精简汇报样例
 - `l0-hotfix-log.md`：安全热修记录样例
 - `fallback-sample.md`：增强失败后自动回退样例
+- `runtime-post-input.json`：worker 优化输入样例
+- `runtime-fallback-input.json`：worker 回退输入样例
+- `manual-review-template.csv`：人工抽检模板
 
 ### `result/`
 运行期产物目录。
 
 - `result/system/changelog.md`：系统级改动日志
+- `result/system/metrics/`：worker 指标日志
+- `result/system/runtime/`：本地运行输出
 - `result/project/dna/`：DNA 产物
 - `result/project/coach/`：红队报告与补丁
 
@@ -99,6 +115,10 @@ flowchart LR
 本仓库脚本。
 
 - `validate_enhancer_setup.py`：检查当前工作区是否完整
+- `l0_enhancer_worker.py`：运行低风险增强 worker
+- `summarize_enhancer_metrics.py`：汇总 token / fallback / 人工抽检指标
+- `record_manual_review.py`：写入人工完整性抽检结果
+- `test_l0_enhancer_worker.py`：本地自测 worker 行为
 
 ### `skills/`
 仓库内镜像的内部维护 skill，方便公开仓库直接携带完整资产。
@@ -118,7 +138,21 @@ flowchart LR
 python .\scripts\validate_enhancer_setup.py
 ```
 
-### 3. 需要维护 enhancer 时，使用内部 skill
+### 3. 本地运行 L0 worker MVP
+
+```bash
+python .\scripts\l0_enhancer_worker.py --input .\examples\runtime-post-input.json --output .\result\system\runtime\demo-post-output.json
+python .\scripts\test_l0_enhancer_worker.py
+python .\scripts\summarize_enhancer_metrics.py
+```
+
+### 4. 记录人工完整性抽检
+
+```bash
+python .\scripts\record_manual_review.py --task-id demo-post-003 --pass true --reviewer Andy --notes "关键结论完整"
+```
+
+### 5. 需要维护 enhancer 时，使用内部 skill
 
 Skill 路径：
 
@@ -155,8 +189,10 @@ python "C:\Users\Andyw\.codex\skills\openclaw-agent-maintainer\scripts\draft_cha
 - 版本化 prompt
 - 策略配置
 - 治理与验收规则
+- 可本地运行的 L0 worker MVP
+- token / fallback / 人工抽检指标闭环
 - 展示样例
 - 校验脚本
 - 内部维护 skill
 
-还没有直接接入真实的 Discord/DingTalk 运行时，也没有真实的 OpenClaw 执行器代码。换句话说，这里已经把“怎么增强、怎么治理、怎么维护”落好了，但还没有把它接成在线服务。
+还没有直接接入真实的 Discord/DingTalk 运行时，也没有把 worker 嵌进真实的 OpenClaw 事件流。换句话说，这里已经不只是文档了，但仍然属于“可跑的本地 MVP”，不是完整在线插件。

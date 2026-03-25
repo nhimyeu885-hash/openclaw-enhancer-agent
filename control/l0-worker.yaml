@@ -1,0 +1,31 @@
+version: "0.1"
+enabled: true
+risk_scope: "L0"
+default_stage: "both"
+
+low_risk_actions:
+  - "dedupe"
+  - "compress"
+  - "structure"
+  - "brief-report"
+
+pre_dispatch:
+  min_chars_for_optimization: 80
+  dedupe_repeated_lines: true
+  preserve_must_keep: true
+  verbatim_markers:
+    - "不要摘要"
+    - "完整原文"
+    - "原样返回"
+    - "full log"
+    - "verbatim"
+
+post_result:
+  keep_sections:
+    - "结论"
+    - "行动项"
+    - "风险"
+    - "状态"
+  max_section_items: 4
+  max_output_chars: 1200
+  preserve_must_keep: true

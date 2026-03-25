@@ -7,6 +7,7 @@
 - 将 `提示词1.0.docx` 迁移为可版本化 prompt 文本
 - 新增 enhancer 策略、治理规则、验收清单和展示样例
 - 新增 `openclaw-agent-maintainer` 内部维护 skill
+- 新增 `L0 enhancer worker` MVP、灰度配置与指标闭环
 
 ### Logging Template
 - 时间：

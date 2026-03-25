@@ -1,0 +1,15 @@
+version: "0.1"
+enabled: true
+mode: "gray"
+
+allowed_channels:
+  - "#homebase"
+  - "#多agent协作"
+
+allowed_stages:
+  - "pre_dispatch"
+  - "post_result"
+
+notes:
+  - "先在 1-2 个频道验证低风险增强"
+  - "观察 fallback 触发率和摘要完整性，再逐步扩展"

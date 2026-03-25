@@ -10,6 +10,9 @@ REQUIRED_FILES = [
     "control/acceptance-checklist.yaml",
     "control/channel-routing.yaml",
     "control/enhancer-output-schema.yaml",
+    "control/l0-worker.yaml",
+    "control/gray-rollout.yaml",
+    "control/metrics-policy.yaml",
     "prompts/agents/homebase.md",
     "prompts/agents/openclaw-enhancer.md",
     "prompts/agents/openclaw-core-config.md",
@@ -18,10 +21,14 @@ REQUIRED_FILES = [
     "docs/openclaw-enhancer-design.md",
     "docs/openclaw-enhancer-compare.md",
     "docs/openclaw-agent-maintainer-skill.md",
+    "docs/l0-enhancer-mvp.md",
     "examples/task-before-after.md",
     "examples/summary-sample.md",
     "examples/l0-hotfix-log.md",
     "examples/fallback-sample.md",
+    "examples/runtime-post-input.json",
+    "examples/runtime-fallback-input.json",
+    "examples/manual-review-template.csv",
     "result/system/changelog.md",
 ]
 
@@ -32,6 +39,13 @@ REQUIRED_POLICY_KEYS = [
     "dedupe_policy:",
     "summary_mode:",
     "safe_l0_autofix:",
+]
+
+REQUIRED_MVP_KEYS = [
+    "risk_scope:",
+    "low_risk_actions:",
+    "allowed_channels:",
+    "metrics_file:",
 ]
 
 
@@ -57,6 +71,21 @@ def main() -> int:
     if policy_missing:
         print("[FAIL] Missing policy keys:")
         for item in policy_missing:
+            print(f"  - {item}")
+        return 1
+
+    mvp_text = "\n".join(
+        (root / path).read_text(encoding="utf-8")
+        for path in [
+            "control/l0-worker.yaml",
+            "control/gray-rollout.yaml",
+            "control/metrics-policy.yaml",
+        ]
+    )
+    missing_mvp = [key for key in REQUIRED_MVP_KEYS if key not in mvp_text]
+    if missing_mvp:
+        print("[FAIL] Missing MVP keys:")
+        for item in missing_mvp:
             print(f"  - {item}")
         return 1
 
